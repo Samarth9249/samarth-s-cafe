@@ -80,68 +80,31 @@ The contact form now uses a simple **mailto** approach that opens the visitor's 
 
 ---
 
-## Setting Up Firebase Database (For Reservations)
+## Reservation System (Local Storage - No Cloud Needed!)
 
-The reservation system uses Firebase Realtime Database to store table bookings.
+The reservation system now uses **localStorage** - perfect for learning! Data is stored in the browser.
 
-### Step 1: Create a Firebase Project
+### How to View Reservations:
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com/) and sign in
-2. Click **Add project** and give it a name (e.g., "samarths-cafe")
-3. Accept the terms and click **Create project**
-4. Once ready, click **Continue**
+1. Open your website in a browser
+2. Open Developer Tools (press F12)
+3. Go to **Console** tab
+4. Type: `viewReservations()` and press Enter
+5. You'll see all reservations listed!
 
-### Step 2: Enable Realtime Database
+### To Clear Reservations:
 
-1. In your Firebase console, click **Build** in the left sidebar
-2. Select **Realtime Database**
-3. Click **Create Database**
-4. Choose a location (preferably closest to you)
-5. Select **Start in test mode** (allows read/write without authentication)
-6. Click **Enable**
+In console, type: `clearReservations()`
 
-### Step 3: Get Your Firebase Config
+### How it works:
 
-1. Click the **Settings icon** (gear) next to **Project Overview**
-2. Select **Project settings**
-3. Scroll down to **Your apps** and click the **</>** (web) icon
-4. Register the app (give it a name like "cafe-website")
-5. You'll see a `firebaseConfig` object - copy these values:
-   ```javascript
-   const firebaseConfig = {
-     apiKey: "YOUR_API_KEY",
-     authDomain: "YOUR_PROJECT.firebaseapp.com",
-     databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-     projectId: "YOUR_PROJECT_ID",
-     storageBucket: "YOUR_PROJECT.appspot.com",
-     messagingSenderId: "YOUR_SENDER_ID",
-     appId: "YOUR_APP_ID",
-   };
-   ```
+- Reservations are saved in the visitor's browser localStorage
+- Each new reservation gets stored with name, email, phone, date, time, etc.
+- Perfect for learning and testing!
 
-### Step 4: Update script.js
+### Note for Production:
 
-1. Open `script.js` in your code editor
-2. Find the Firebase config section (around line 150)
-3. Replace the placeholder values with your actual Firebase config:
-   ```javascript
-   const firebaseConfig = {
-     apiKey: "AIzaSy...",
-     authDomain: "samarths-cafe.firebaseapp.com",
-     databaseURL: "https://samarths-cafe.firebaseio.com",
-     projectId: "samarths-cafe",
-     storageBucket: "samarths-cafe.appspot.com",
-     messagingSenderId: "123456789",
-     appId: "1:123456789:web:abc123...",
-   };
-   ```
-
-### Step 5: View Reservations
-
-1. Go to your Firebase Console
-2. Click **Build** > **Realtime Database**
-3. You will see all reservations stored under the "reservations" node
-4. Each reservation shows: name, email, phone, guests, date, time, special requests
+For a real cafe with multiple customers, you'd need a cloud database. But for learning, this works great!
 
 ---
 
@@ -174,7 +137,7 @@ Change `₹80` to your desired price.
 - **Font Awesome** - Icons
 - **Google Fonts** - Typography (Playfair Display & Poppins)
 - **Formspree** - Contact form backend
-
+ 
 ## Browser Support
 
 - Chrome (latest)

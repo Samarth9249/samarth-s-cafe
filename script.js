@@ -47,7 +47,7 @@ const contactForm = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
 
 // Cafe owner's email - CHANGE THIS TO YOUR EMAIL
-const OWNER_EMAIL = "hello@samarthscafe.com";
+const OWNER_EMAIL = "samarth1561@gmail.com";
 
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
@@ -179,36 +179,19 @@ console.log('%c☕ Welcome to Samarth\'s Cafe! ☕', 'font-size: 20px; color: #8
 console.log('%cThank you for visiting our website!', 'color: #666;');
 
 // ==========================================
-// FIREBASE RESERVATION SYSTEM (DATABASE)
+// LOCAL STORAGE RESERVATION SYSTEM
+// (No cloud needed - perfect for learning!)
 // ==========================================
 
-// Initialize Firebase (Replace with your Firebase config)
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();
-
-// Reservation Form Handling
+// Reservation Form Handling - Using LocalStorage
 const reservationForm = document.getElementById('reservationForm');
 const reservationStatus = document.getElementById('reservationStatus');
 
 // Set minimum date to today
-const dateInput = document.getElementById('resDate');
-if (dateInput) {
+const resDateInput = document.getElementById('resDate');
+if (resDateInput) {
     const today = new Date().toISOString().split('T')[0];
-    dateInput.setAttribute('min', today);
+    resDateInput.setAttribute('min', today);
 }
 
 if (reservationForm) {
@@ -222,6 +205,7 @@ if (reservationForm) {
         
         // Get form values
         const reservationData = {
+            id: Date.now(),
             name: document.getElementById('resName').value,
             email: document.getElementById('resEmail').value,
             phone: document.getElementById('resPhone').value,
@@ -230,25 +214,28 @@ if (reservationForm) {
             time: document.getElementById('resTime').value,
             specialRequests: document.getElementById('resSpecial').value,
             status: 'pending',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toLocaleString()
         };
         
-        // Save to Firebase Realtime Database
-        const reservationsRef = database.ref('reservations');
-        reservationsRef.push(reservationData)
-            .then(() => {
-                reservationStatus.innerHTML = '<i class="fas fa-check-circle"></i> Reservation confirmed! We\'ll send you a confirmation email shortly.';
-                reservationStatus.className = 'success';
-                reservationForm.reset();
-                
-                // Send confirmation email (via Formspree as fallback)
-                sendConfirmationEmail(reservationData);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                reservationStatus.innerHTML = 'Error saving reservation. Please try again or call us directly.';
-                reservationStatus.className = 'error';
-            });
+        // Save to localStorage
+        try {
+            let reservations = JSON.parse(localStorage.getItem('cafeReservations') || '[]');
+            reservations.push(reservationData);
+            localStorage.setItem('cafeReservations', JSON.stringify(reservations));
+            
+            reservationStatus.innerHTML = '<i class="fas fa-check-circle"></i> Reservation confirmed! We\'ll contact you shortly for confirmation.';
+            reservationStatus.className = 'success';
+            reservationForm.reset();
+            
+            // Console log for testing
+            console.log('New Reservation:', reservationData);
+            console.log('All Reservations:', JSON.parse(localStorage.getItem('cafeReservations') || '[]'));
+            
+        } catch (error) {
+            console.error('Error:', error);
+            reservationStatus.innerHTML = 'Error saving reservation. Please try again.';
+            reservationStatus.className = 'error';
+        }
         
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -261,23 +248,32 @@ if (reservationForm) {
     });
 }
 
-// Function to send confirmation email (using Formspree)
-function sendConfirmationEmail(data) {
-    fetch('https://formspree.io/f/YOUR_FORM_ID', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            subject: `New Reservation: ${data.name}`,
-            name: data.name,
-            email: data.email,
-            message: `New Reservation Received!\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nGuests: ${data.guests}\nDate: ${data.date}\nTime: ${data.time}\nSpecial Requests: ${data.specialRequests}`
-        })
-    }).catch(err => console.log('Email notification error:', err));
+// Admin function to view reservations
+// Open browser console and type: viewReservations()
+function viewReservations() {
+    const reservations = JSON.parse(localStorage.getItem('cafeReservations') || '[]');
+    console.log('=== SAMARTH\'S CAFE RESERVATIONS ===');
+    console.log('Total:', reservations.length);
+    console.log('-----------------------------------');
+    reservations.forEach((res, index) => {
+        console.log('#' + (index + 1));
+        console.log('Name:', res.name);
+        console.log('Email:', res.email);
+        console.log('Phone:', res.phone);
+        console.log('Guests:', res.guests);
+        console.log('Date:', res.date);
+        console.log('Time:', res.time);
+        console.log('Special Requests:', res.specialRequests || 'None');
+        console.log('-----------------------------------');
+    });
+    return reservations;
 }
 
-// Admin Panel - View Reservations (for cafe owner)
-// To view reservations, create an admin.html page or use Firebase Console
+// To delete all reservations: type clearReservations() in console
+function clearReservations() {
+    if (confirm('Are you sure you want to delete all reservations?')) {
+        localStorage.removeItem('cafeReservations');
+        console.log('All reservations cleared!');
+    }
+}
 
