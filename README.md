@@ -56,53 +56,27 @@ Follow these steps to make your website publicly accessible:
 2. You will see a link like: `https://yourusername.github.io/samarths-cafe/`
 3. This is your public website link! Share it with everyone.
 
-## Setting Up the Contact Form
+## Contact Form (Email + LocalStorage)
 
-The contact form uses [Formspree](https://formspree.io/) to handle submissions without requiring a backend server.
+The contact form now uses a simple **mailto** approach that opens the visitor's email client. No backend needed!
 
-### Step 1: Create a Formspree Account
+### How it works:
 
-1. Go to [formspree.io](https://formspree.io/) and sign up (it's free!)
-2. Click **New Form** to create a new form
-3. Name it "Samarth's Cafe Contact"
-4. Click **Create Form**
+1. When someone fills out the contact form, their default email app opens
+2. The message is pre-filled with their input
+3. A backup copy is also saved in the browser's localStorage
 
-### Step 2: Get Your Form ID
+### To customize:
 
-1. In your Formspree dashboard, click on your form
-2. Go to the **Integrations** tab
-3. Copy the **Endpoint** URL, which looks like:
-   `https://formspree.io/f/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+1. Open `script.js`
+2. Find the line: `const OWNER_EMAIL = "hello@samarthscafe.com";`
+3. Replace with your actual email address
 
-### Step 3: Update Your HTML
+### To view saved messages (localStorage):
 
-1. Open `index.html` in your code editor
-2. Find this line:
-   ```html
-   <form
-     id="contactForm"
-     action="https://formspree.io/f/YOUR_FORM_ID"
-     method="POST"
-   ></form>
-   ```
-3. Replace `YOUR_FORM_ID` with your actual Formspree form ID:
-
-   ```html
-   <form
-     id="contactForm"
-     action="https://formspree.io/f/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-     method="POST"
-   ></form>
-   ```
-
-4. Save the file and commit the changes to GitHub
-
-### Step 4: Test Your Form
-
-1. Visit your live website
-2. Fill out the contact form
-3. Click "Send Message"
-4. You should receive the submissions in your Formspree dashboard
+- Open browser Developer Tools (F12)
+- Go to Application > Local Storage
+- Look for `cafeMessages` key
 
 ---
 

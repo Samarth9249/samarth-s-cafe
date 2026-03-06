@@ -42,55 +42,73 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Form handling with Formspree
+// Form handling - Email + LocalStorage (No backend needed)
 const contactForm = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
 
+// Cafe owner's email - CHANGE THIS TO YOUR EMAIL
+const OWNER_EMAIL = "hello@samarthscafe.com";
+
 if (contactForm) {
-    contactForm.addEventListener('submit', async function(e) {
+    contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Sending...';
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
         
-        try {
-            const formData = new FormData(contactForm);
-            const response = await fetch(contactForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                formStatus.textContent = 'Thank you! Your message has been sent successfully. We\'ll get back to you soon!';
-                formStatus.className = 'success';
-                contactForm.reset();
-            } else {
-                const data = await response.json();
-                if (data.errors) {
-                    formStatus.textContent = data.errors.map(error => error.message).join(', ');
-                } else {
-                    formStatus.textContent = 'Oops! There was a problem sending your message. Please try again.';
-                }
-                formStatus.className = 'error';
-            }
-        } catch (error) {
-            formStatus.textContent = 'Oops! There was a problem sending your message. Please try again.';
-            formStatus.className = 'error';
-        }
+        // Get form values
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
         
-        submitBtn.textContent = originalText;
+        // Create email body
+        const emailBody = `New Message from Website\n\n` +
+            `Name: ${name}\n` +
+            `Email: ${email}\n` +
+            `Phone: ${phone}\n` +
+            `Subject: ${subject}\n\n` +
+            `Message:\n${message}`;
+        
+        // Encode for mailto link
+        const encodedBody = encodeURIComponent(emailBody);
+        const encodedSubject = encodeURIComponent(`Samarth's Cafe: ${subject}`);
+        
+        // Open email client
+        window.location.href = `mailto:${OWNER_EMAIL}?subject=${encodedSubject}&body=${encodedBody}`;
+        
+        // Save to localStorage as backup
+        const submission = {
+            id: Date.now(),
+            name: name,
+            email: email,
+            phone: phone,
+            subject: subject,
+            message: message,
+            date: new Date().toISOString()
+        };
+        
+        // Get existing submissions
+        let submissions = JSON.parse(localStorage.getItem('cafeMessages') || '[]');
+        submissions.push(submission);
+        localStorage.setItem('cafeMessages', JSON.stringify(submissions));
+        
+        // Show success message
+        formStatus.innerHTML = '<i class="fas fa-check-circle"></i> Your email client has opened. Please send the email to complete your message. A copy is also saved locally.';
+        formStatus.className = 'success';
+        contactForm.reset();
+        
+        submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
         
-        // Clear status message after 5 seconds
+        // Clear status after 8 seconds
         setTimeout(() => {
-            formStatus.textContent = '';
+            formStatus.innerHTML = '';
             formStatus.className = '';
-        }, 5000);
+        }, 8000);
     });
 }
 
